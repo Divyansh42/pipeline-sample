@@ -12,7 +12,7 @@ spec:
   tasks:
     - name: build-ui
       taskRef:
-        name: s2i-python-3
+        name: buildah
         kind: ClusterTask
       resources:
         inputs:

@@ -7,7 +7,7 @@ spec:
   type: git
   params:
     - name: url
-      value: http://github.com/Divyansh42/icndp-app
+      value: https://github.com/nikhil-thomas/icndp-app
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
