@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: build-and-deploy
+spec:
+  resources:
+    - name: ui-repo
+      type: git
+    - name: ui-image
+      type: image
+
+  tasks:
+    - name: build-ui
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      resources:
+        inputs:
+          - name: source
+            resource: ui-repo
+        outputs:
+          - name: image
+            resource: ui-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
+
+    - name: build-application
+      taskRef:
+          name: build-application
+      resources:
+          inputs: 
+            - name: source
+              resource: ui-repo  
+            - name: image
+              resource: ui-image
+      params:
+        - name: deployment  
+          value: "icndb-app"
+      runAfter:
+          - build-ui

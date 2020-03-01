@@ -1,0 +1,34 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: build-application
+spec:
+  inputs:
+    resources:
+      - name: source
+        type: git
+      - name: image
+        type: image  
+    params:
+      - name: manifest_dir
+        description: The directory in source that contains yaml manifests
+        type: string
+        default: "k8s"
+      - name: deployment
+        type: string
+      
+  steps:
+    - name: build-application
+      image: quay.io/openshift/origin-cli:latest
+      workingDir: /workspace/source
+      script: |
+        #!/usr/bin/env bash
+        echo Applying manifests in $(inputs.params.manifest_dir) directory
+        oc apply -f $(inputs.params.manifest_dir)
+        echo -----------------------------------
+        oc patch deployment $(inputs.params.deployment) --patch='{"spec":{"template":{"spec":{
+          "containers":[{
+            "name": "$(inputs.params.deployment)",
+            "image":"$(inputs.resources.image.url)"
+          }]
+        }}}}'
